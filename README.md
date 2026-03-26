@@ -3,7 +3,9 @@
 An AI-powered Retrieval-Augmented Generation (RAG) system that lets you chat with your documents. Upload PDF, DOCX, or TXT files and ask questions — answers are grounded in your document content with source references.
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
+![Tests](https://img.shields.io/badge/Tests-passed-brightgreen)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.40+-red)
+![ChromaDB](https://img.shields.io/badge/ChromaDB-0.5+-orange)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ## How It Works
