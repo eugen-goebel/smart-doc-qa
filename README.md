@@ -35,7 +35,7 @@ An AI-powered Retrieval-Augmented Generation (RAG) system that lets you chat wit
 
 ```bash
 # Clone and setup
-git clone https://github.com/YOUR_USERNAME/smart-doc-qa.git
+git clone https://github.com/eugen-goebel/smart-doc-qa.git
 cd smart-doc-qa
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
