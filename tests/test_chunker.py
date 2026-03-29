@@ -13,7 +13,7 @@ def chunker():
 @pytest.fixture
 def long_text():
     """Generate a text that's about 500 characters long."""
-    return "This is sentence number {i}. " * 20
+    return "".join(f"This is sentence number {i}. " for i in range(20))
 
 
 # --- Basic chunking ---
