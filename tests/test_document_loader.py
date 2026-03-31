@@ -27,6 +27,14 @@ def empty_txt(tmp_path):
     return str(path)
 
 
+@pytest.fixture
+def sample_md(tmp_path):
+    """Create a temporary .md file with sample Markdown content."""
+    path = tmp_path / "readme.md"
+    path.write_text("# Project Title\n\nThis is a **Markdown** document.\n\n## Section\n\n- Item one\n- Item two")
+    return str(path)
+
+
 # --- Loading tests ---
 
 class TestDocumentLoader:
@@ -61,10 +69,24 @@ class TestDocumentLoader:
         with pytest.raises(ValueError, match="Unsupported format"):
             loader.load(str(path))
 
+    def test_load_md_extracts_text(self, loader, sample_md):
+        doc = loader.load(sample_md)
+        assert "Project Title" in doc.text
+        assert "**Markdown**" in doc.text
+        assert doc.format == "md"
+        assert doc.page_count == 1
+        assert doc.char_count > 0
+
+    def test_load_md_metadata(self, loader, sample_md):
+        doc = loader.load(sample_md)
+        assert doc.filename == "readme.md"
+        assert doc.format == "md"
+
     def test_supported_formats_constant(self):
         assert ".pdf" in SUPPORTED_FORMATS
         assert ".docx" in SUPPORTED_FORMATS
         assert ".txt" in SUPPORTED_FORMATS
+        assert ".md" in SUPPORTED_FORMATS
 
 
 # --- Model tests ---

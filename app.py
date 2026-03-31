@@ -94,9 +94,9 @@ with st.sidebar:
     # File upload
     uploaded = st.file_uploader(
         "Upload documents",
-        type=["pdf", "docx", "txt"],
+        type=["pdf", "docx", "txt", "md"],
         accept_multiple_files=True,
-        help="Drag & drop PDF, DOCX, or TXT files here",
+        help="Drag & drop PDF, DOCX, TXT, or Markdown files here",
     )
 
     # "Load sample" button for quick testing
