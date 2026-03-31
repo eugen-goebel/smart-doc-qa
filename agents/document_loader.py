@@ -1,5 +1,5 @@
 """
-Document Loader — Reads PDF, DOCX, and TXT files and extracts plain text.
+Document Loader — Reads PDF, DOCX, TXT, and Markdown files and extracts plain text.
 
 Think of this as a "translator" that converts different file formats into
 a single format (plain text) that the rest of the pipeline can work with.
@@ -8,6 +8,7 @@ Supported formats:
   - .pdf  → uses pypdf to extract text from each page
   - .docx → uses python-docx to read paragraphs
   - .txt  → reads the file directly
+  - .md   → reads the file directly (Markdown is already human-readable)
 """
 
 import os
@@ -32,7 +33,7 @@ class LoadedDocument(BaseModel):
         char_count: Total number of characters in the text
     """
     filename: str = Field(description="Original filename")
-    format: str = Field(description="File format: pdf, docx, or txt")
+    format: str = Field(description="File format: pdf, docx, txt, or md")
     text: str = Field(description="Full extracted text")
     page_count: int = Field(description="Number of pages (1 for txt/docx)")
     char_count: int = Field(description="Total characters in the text")
@@ -42,7 +43,7 @@ class LoadedDocument(BaseModel):
 # Supported file extensions
 # ---------------------------------------------------------------------------
 
-SUPPORTED_FORMATS = {".pdf", ".docx", ".txt"}
+SUPPORTED_FORMATS = {".pdf", ".docx", ".txt", ".md"}
 
 
 # ---------------------------------------------------------------------------
@@ -91,6 +92,8 @@ class DocumentLoader:
             text, page_count = self._read_pdf(filepath)
         elif ext == ".docx":
             text, page_count = self._read_docx(filepath)
+        elif ext == ".md":
+            text, page_count = self._read_md(filepath)
         else:
             text, page_count = self._read_txt(filepath)
 
@@ -132,6 +135,12 @@ class DocumentLoader:
 
     def _read_txt(self, filepath: str) -> tuple[str, int]:
         """Read a plain text file."""
+        with open(filepath, "r", encoding="utf-8") as f:
+            text = f.read()
+        return text, 1
+
+    def _read_md(self, filepath: str) -> tuple[str, int]:
+        """Read a Markdown file. Markdown is already human-readable plain text."""
         with open(filepath, "r", encoding="utf-8") as f:
             text = f.read()
         return text, 1
