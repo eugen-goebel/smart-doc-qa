@@ -29,6 +29,8 @@ from pydantic import BaseModel, Field
 
 from .chunker import TextChunk
 
+DEFAULT_PERSIST_DIR = ".chroma_data"
+
 
 # ---------------------------------------------------------------------------
 # Data model
@@ -170,6 +172,14 @@ class VectorStore:
             ))
 
         return search_results
+
+    def list_sources(self) -> list[str]:
+        """Return a sorted list of unique source filenames in the store."""
+        if self._collection.count() == 0:
+            return []
+        all_meta = self._collection.get(include=["metadatas"])
+        sources = {m["source"] for m in all_meta["metadatas"] if "source" in m}
+        return sorted(sources)
 
     def reset(self):
         """Delete all stored chunks (start fresh)."""
