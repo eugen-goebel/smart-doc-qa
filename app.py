@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 
 from agents.document_loader import DocumentLoader
 from agents.chunker import TextChunker
-from agents.vectorstore import VectorStore
+from agents.vectorstore import VectorStore, DEFAULT_PERSIST_DIR
 from agents.qa_agent import QAAgent
 
 # Load environment variables (for ANTHROPIC_API_KEY)
@@ -48,13 +48,15 @@ st.set_page_config(
 def init_session_state():
     """Initialize session state variables if they don't exist yet."""
     if "vector_store" not in st.session_state:
-        st.session_state.vector_store = VectorStore()
+        persist_dir = os.environ.get("CHROMA_PERSIST_DIR", DEFAULT_PERSIST_DIR)
+        st.session_state.vector_store = VectorStore(persist_dir=persist_dir)
     if "messages" not in st.session_state:
         st.session_state.messages = []
     if "uploaded_files" not in st.session_state:
-        st.session_state.uploaded_files = []
+        # Restore previously indexed files from persistent store
+        st.session_state.uploaded_files = st.session_state.vector_store.list_sources()
     if "total_chunks" not in st.session_state:
-        st.session_state.total_chunks = 0
+        st.session_state.total_chunks = st.session_state.vector_store.count
 
 
 init_session_state()
