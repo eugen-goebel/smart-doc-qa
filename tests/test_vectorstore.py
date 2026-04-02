@@ -1,5 +1,6 @@
 """Tests for the VectorStore agent."""
 
+import os
 import uuid
 import pytest
 
@@ -160,3 +161,68 @@ class TestSearchResultModel:
         )
         restored = SearchResult.model_validate_json(r.model_dump_json())
         assert restored == r
+
+
+# --- Persistence ---
+
+class TestPersistence:
+    def test_data_survives_reopen(self, tmp_path, sample_chunks):
+        persist_dir = str(tmp_path / "chroma_store")
+        col_name = f"test_{uuid.uuid4().hex[:8]}"
+
+        store1 = VectorStore(persist_dir=persist_dir, collection_name=col_name)
+        store1.add_chunks(sample_chunks)
+        assert store1.count == 5
+
+        store2 = VectorStore(persist_dir=persist_dir, collection_name=col_name)
+        assert store2.count == 5
+
+    def test_search_works_after_reopen(self, tmp_path, sample_chunks):
+        persist_dir = str(tmp_path / "chroma_store")
+        col_name = f"test_{uuid.uuid4().hex[:8]}"
+
+        store1 = VectorStore(persist_dir=persist_dir, collection_name=col_name)
+        store1.add_chunks(sample_chunks)
+
+        store2 = VectorStore(persist_dir=persist_dir, collection_name=col_name)
+        results = store2.search("revenue", top_k=2)
+        assert len(results) > 0
+        assert any("revenue" in r.text.lower() for r in results)
+
+    def test_persistent_store_creates_directory(self, tmp_path):
+        persist_dir = str(tmp_path / "new_dir" / "chroma")
+        VectorStore(persist_dir=persist_dir)
+        assert os.path.isdir(persist_dir)
+
+    def test_reset_clears_persistent_store(self, tmp_path, sample_chunks):
+        persist_dir = str(tmp_path / "chroma_store")
+        col_name = f"test_{uuid.uuid4().hex[:8]}"
+
+        store = VectorStore(persist_dir=persist_dir, collection_name=col_name)
+        store.add_chunks(sample_chunks)
+        store.reset()
+        assert store.count == 0
+
+
+# --- List sources ---
+
+class TestListSources:
+    def test_empty_store_returns_empty(self, store):
+        assert store.list_sources() == []
+
+    def test_returns_unique_sources(self, store):
+        chunks = [
+            TextChunk(text="A", chunk_index=0, start_char=0, end_char=1, source="a.pdf"),
+            TextChunk(text="B", chunk_index=1, start_char=1, end_char=2, source="a.pdf"),
+            TextChunk(text="C", chunk_index=0, start_char=0, end_char=1, source="b.txt"),
+        ]
+        store.add_chunks(chunks)
+        sources = store.list_sources()
+        assert sources == ["a.pdf", "b.txt"]
+
+    def test_sources_sorted(self, store, sample_chunks):
+        store.add_chunks(sample_chunks)
+        extra = [TextChunk(text="X", chunk_index=0, start_char=0, end_char=1, source="aaa.txt")]
+        store.add_chunks(extra)
+        sources = store.list_sources()
+        assert sources == sorted(sources)
