@@ -14,6 +14,7 @@ venv/
 
 # ChromaDB local storage
 vectorstore/chroma_data/
+.chroma_data/
 
 # IDE
 .vscode/
