@@ -9,6 +9,17 @@ An AI-powered Retrieval-Augmented Generation (RAG) system that lets you chat wit
 ![ChromaDB](https://img.shields.io/badge/ChromaDB-0.5+-orange)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
+## Screenshots
+
+**Demo Mode** — clean landing view; runs without an API key using raw retrieval results
+![Landing](docs/screenshots/01-landing.png)
+
+**Question Answered** — asking about 2025 revenue returns the most relevant chunk with source reference
+![Question Answered](docs/screenshots/02-question-answered.png)
+
+**Retrieved Chunks** — similarity search surfaces multiple ranked matches across the document
+![Retrieved Chunks](docs/screenshots/03-retrieved-chunks.png)
+
 ## How It Works
 
 ```
