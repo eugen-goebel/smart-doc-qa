@@ -12,6 +12,14 @@ To run:
 """
 
 import os
+
+# Force pure-Python protobuf implementation. The C++ extension's
+# generated _pb2.py descriptors (in chromadb -> opentelemetry-proto)
+# are incompatible with protobuf 5.x on Python 3.13+, which is the
+# default on Streamlit Community Cloud. Must be set before any
+# protobuf-using import (streamlit, chromadb).
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
+
 import tempfile
 
 import streamlit as st
