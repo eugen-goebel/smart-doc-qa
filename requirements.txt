@@ -1,8 +1,16 @@
 anthropic>=0.49.0
 streamlit>=1.40.0
-chromadb>=0.5.0
+chromadb>=1.0.0
 pypdf>=4.0.0
 python-docx>=1.1.0
 python-dotenv>=1.0.0
 pydantic>=2.0.0
 pytest>=8.0.0
+
+# Pin opentelemetry-proto and protobuf so chromadb's transitive
+# tracing deps don't trip _CheckCalledFromGeneratedFile on Streamlit
+# Cloud. The older opentelemetry-proto _pb2 files were generated with
+# a protoc that's incompatible with protobuf 5.x.
+opentelemetry-proto>=1.27.0
+opentelemetry-exporter-otlp-proto-grpc>=1.27.0
+protobuf>=5.27.0
