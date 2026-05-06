@@ -25,7 +25,7 @@ vectorstore/chroma_data/
 Thumbs.db
 
 # Streamlit
-.streamlit/
+.streamlit/secrets.toml
 
 # Output
 output/

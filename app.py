@@ -69,8 +69,14 @@ init_session_state()
 with st.sidebar:
     st.title("📄 Documents")
 
-    # API key handling — demo mode if no key provided
+    # API key handling — checks env, then Streamlit secrets, then user input.
+    # Demo mode if no key provided.
     api_key = os.getenv("ANTHROPIC_API_KEY")
+    if not api_key:
+        try:
+            api_key = st.secrets.get("ANTHROPIC_API_KEY", "")
+        except (FileNotFoundError, AttributeError):
+            api_key = ""
     if not api_key:
         api_key = st.text_input(
             "Anthropic API Key (optional)",
