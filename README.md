@@ -9,6 +9,8 @@ An AI-powered Retrieval-Augmented Generation (RAG) system that lets you chat wit
 ![ChromaDB](https://img.shields.io/badge/ChromaDB-0.5+-orange)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
+> **Try it live:** _(Streamlit Cloud demo URL will be added once deployed — see [Deployment](#deployment) section.)_
+
 ## Screenshots
 
 **Demo Mode** — clean landing view; runs without an API key using raw retrieval results
@@ -142,6 +144,31 @@ pytest tests/test_vectorstore.py -v
 ```
 
 All tests run without an API key. The QA agent tests use mocked API responses.
+
+## Deployment
+
+This app is designed to deploy in one click on **Streamlit Community Cloud** (free tier).
+
+**Steps:**
+
+1. Sign in at [share.streamlit.io](https://share.streamlit.io) with your GitHub account.
+2. Click **New app** and pick this repository / branch / `app.py`.
+3. _(Optional)_ In **Advanced settings → Secrets**, paste:
+   ```toml
+   ANTHROPIC_API_KEY = "sk-ant-..."
+   ```
+   See [`.streamlit/secrets.toml.example`](.streamlit/secrets.toml.example).
+4. Click **Deploy**. The app builds in ~2 minutes.
+
+**API key handling:**
+
+The app reads the key from three places, in this order:
+
+1. `os.environ["ANTHROPIC_API_KEY"]` — set via `.env` for local runs
+2. `st.secrets["ANTHROPIC_API_KEY"]` — set in Streamlit Cloud dashboard
+3. Manual entry in the sidebar — fallback for end users
+
+If no key is provided, the app runs in **Demo Mode**: vector search still works, but the model-generated answer step is skipped and the raw retrieved chunks are shown instead.
 
 ## License
 
