@@ -234,7 +234,14 @@ if prompt := st.chat_input("Ask a question about your documents..."):
                 api_key=api_key if not demo_mode else None,
                 demo_mode=demo_mode,
             )
-            response = agent.ask(prompt)
+            # Forward the chat history (excluding the new user message we
+            # just appended) so the model can resolve follow-up questions.
+            history = [
+                {"role": m["role"], "content": m["content"]}
+                for m in st.session_state.messages[:-1]
+                if m.get("role") in ("user", "assistant")
+            ]
+            response = agent.ask(prompt, conversation_history=history)
 
         st.markdown(response.answer)
 
