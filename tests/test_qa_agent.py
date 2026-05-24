@@ -145,6 +145,102 @@ class TestQAAgent:
         assert "Source:" in context
 
 
+# --- Conversation memory ---
+
+class TestConversationHistory:
+    """ask() must forward previous turns to the LLM and cap history length."""
+
+    @patch("agents.qa_agent.anthropic.Anthropic")
+    def test_no_history_sends_single_user_message(
+        self, mock_client_class, mock_store, mock_anthropic_response
+    ):
+        mock_client = mock_client_class.return_value
+        mock_client.messages.create.return_value = mock_anthropic_response
+
+        agent = QAAgent(vector_store=mock_store, api_key="test-key")
+        agent.ask("Who is the CEO?")
+
+        messages = mock_client.messages.create.call_args.kwargs["messages"]
+        assert len(messages) == 1
+        assert messages[0]["role"] == "user"
+
+    @patch("agents.qa_agent.anthropic.Anthropic")
+    def test_history_is_forwarded(
+        self, mock_client_class, mock_store, mock_anthropic_response
+    ):
+        mock_client = mock_client_class.return_value
+        mock_client.messages.create.return_value = mock_anthropic_response
+
+        agent = QAAgent(vector_store=mock_store, api_key="test-key")
+        history = [
+            {"role": "user", "content": "What is the revenue?"},
+            {"role": "assistant", "content": "EUR 47.3 million."},
+        ]
+        agent.ask("And the year before?", conversation_history=history)
+
+        messages = mock_client.messages.create.call_args.kwargs["messages"]
+        assert len(messages) == 3
+        assert messages[0] == {"role": "user", "content": "What is the revenue?"}
+        assert messages[1] == {"role": "assistant", "content": "EUR 47.3 million."}
+        assert messages[2]["role"] == "user"
+        assert "year before" in messages[2]["content"]
+
+    @patch("agents.qa_agent.anthropic.Anthropic")
+    def test_history_is_trimmed_to_max_turns(
+        self, mock_client_class, mock_store, mock_anthropic_response
+    ):
+        mock_client = mock_client_class.return_value
+        mock_client.messages.create.return_value = mock_anthropic_response
+
+        # 6 full turns = 12 messages; max=2 turns should keep the last 4
+        history = []
+        for i in range(6):
+            history.append({"role": "user", "content": f"q{i}"})
+            history.append({"role": "assistant", "content": f"a{i}"})
+
+        agent = QAAgent(vector_store=mock_store, api_key="test-key", max_history_turns=2)
+        agent.ask("latest?", conversation_history=history)
+
+        messages = mock_client.messages.create.call_args.kwargs["messages"]
+        # 2 turns * 2 messages + 1 new user = 5
+        assert len(messages) == 5
+        assert messages[0] == {"role": "user", "content": "q4"}
+        assert messages[1] == {"role": "assistant", "content": "a4"}
+        assert messages[-1]["role"] == "user"
+        assert "latest" in messages[-1]["content"]
+
+    @patch("agents.qa_agent.anthropic.Anthropic")
+    def test_history_filters_unexpected_roles(
+        self, mock_client_class, mock_store, mock_anthropic_response
+    ):
+        mock_client = mock_client_class.return_value
+        mock_client.messages.create.return_value = mock_anthropic_response
+
+        history = [
+            {"role": "user", "content": "ok"},
+            {"role": "system", "content": "ignored"},        # should be dropped
+            {"role": "assistant", "content": "ok back"},
+            {"role": "user"},                                  # missing content
+            {"foo": "bar"},                                    # not a turn
+        ]
+        agent = QAAgent(vector_store=mock_store, api_key="test-key")
+        agent.ask("next?", conversation_history=history)
+
+        messages = mock_client.messages.create.call_args.kwargs["messages"]
+        assert [m["role"] for m in messages] == ["user", "assistant", "user"]
+
+    def test_demo_mode_ignores_history(self, mock_store):
+        agent = QAAgent(vector_store=mock_store, demo_mode=True)
+        history = [{"role": "user", "content": "earlier"},
+                   {"role": "assistant", "content": "answer"}]
+
+        # Should not raise even though no API client exists, and should
+        # still produce a demo-mode answer with the retrieved chunks.
+        response = agent.ask("revenue?", conversation_history=history)
+        assert response.model == "demo-mode"
+        assert "DEMO MODE" in response.answer
+
+
 # --- System prompt ---
 
 class TestSystemPrompt:

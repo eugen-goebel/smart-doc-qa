@@ -107,21 +107,27 @@ class QAAgent:
         model: str = "claude-sonnet-4-6",
         top_k: int = 5,
         demo_mode: bool = False,
+        max_history_turns: int = 10,
     ):
         """
         Initialize the QA agent.
 
         Args:
-            vector_store: The VectorStore containing document chunks
-            api_key:      Anthropic API key (reads from env if None)
-            model:        LLM model to use for answers
-            top_k:        How many chunks to retrieve per question
-            demo_mode:    If True, skip API calls and return raw context
+            vector_store:      The VectorStore containing document chunks
+            api_key:           Anthropic API key (reads from env if None)
+            model:             LLM model to use for answers
+            top_k:             How many chunks to retrieve per question
+            demo_mode:         If True, skip API calls and return raw context
+            max_history_turns: Maximum past user/assistant pairs to forward
+                               with each question. Older turns are dropped
+                               (oldest-first) so the context window stays
+                               bounded.
         """
         self.demo_mode = demo_mode
         self.model = model
         self.vector_store = vector_store
         self.top_k = top_k
+        self.max_history_turns = max_history_turns
 
         # Only create the API client if we actually need it
         if not demo_mode:
@@ -129,7 +135,11 @@ class QAAgent:
         else:
             self.client = None
 
-    def ask(self, question: str) -> QAResponse:
+    def ask(
+        self,
+        question: str,
+        conversation_history: list[dict] | None = None,
+    ) -> QAResponse:
         """
         Ask a question about the loaded documents.
 
@@ -140,7 +150,13 @@ class QAAgent:
           4. Return the answer with source references
 
         Args:
-            question: The user's question in natural language
+            question:             The user's question in natural language
+            conversation_history: Previous turns as a list of
+                                  ``{"role": "user"|"assistant",
+                                  "content": str}`` dicts. Trimmed to the
+                                  last ``max_history_turns`` exchanges
+                                  before being sent to the model. Demo
+                                  mode ignores it.
 
         Returns:
             QAResponse with the answer and source references
@@ -163,7 +179,7 @@ class QAAgent:
             # Demo mode: show the retrieved chunks directly
             answer_text = self._build_demo_answer(question, search_results)
         else:
-            # Normal mode: send to LLM API
+            # Normal mode: send to LLM API with optional conversation history
             user_message = (
                 f"Context from the user's documents:\n"
                 f"---\n"
@@ -172,11 +188,13 @@ class QAAgent:
                 f"Question: {question}"
             )
 
+            messages = self._build_messages(conversation_history, user_message)
+
             response = self.client.messages.create(
                 model=self.model,
                 max_tokens=2048,
                 system=SYSTEM_PROMPT,
-                messages=[{"role": "user", "content": user_message}],
+                messages=messages,
             )
 
             answer_text = response.content[0].text
@@ -196,6 +214,33 @@ class QAAgent:
             sources=sources,
             model="demo-mode" if self.demo_mode else self.model,
         )
+
+    def _build_messages(
+        self,
+        conversation_history: list[dict] | None,
+        latest_user_message: str,
+    ) -> list[dict]:
+        """Combine trimmed conversation history with the current turn.
+
+        Filters out anything that isn't a clean user/assistant pair and
+        keeps only the most recent ``max_history_turns`` exchanges so the
+        token budget stays predictable.
+        """
+        messages: list[dict] = []
+
+        if conversation_history:
+            cleaned = [
+                {"role": m["role"], "content": m["content"]}
+                for m in conversation_history
+                if isinstance(m, dict)
+                and m.get("role") in ("user", "assistant")
+                and isinstance(m.get("content"), str)
+            ]
+            # Keep the last 2*max_history_turns messages (a turn = user + assistant)
+            messages.extend(cleaned[-self.max_history_turns * 2:])
+
+        messages.append({"role": "user", "content": latest_user_message})
+        return messages
 
     def _build_demo_answer(self, question: str, results: list[SearchResult]) -> str:
         """
