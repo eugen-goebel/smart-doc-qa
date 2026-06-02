@@ -1,6 +1,6 @@
 # Smart Document Q&A
 
-An AI-powered Retrieval-Augmented Generation (RAG) system that lets you chat with your documents. Upload PDF, DOCX, or TXT files and ask questions — answers are grounded in your document content with source references.
+An AI-powered Retrieval-Augmented Generation (RAG) system that lets you chat with your documents. Upload PDF, DOCX, or TXT files and ask questions. Answers are grounded in your document content with source references.
 
 ![CI](https://github.com/eugen-goebel/smart-doc-qa/actions/workflows/tests.yml/badge.svg)
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
@@ -10,17 +10,17 @@ An AI-powered Retrieval-Augmented Generation (RAG) system that lets you chat wit
 ![License](https://img.shields.io/badge/License-MIT-green)
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Streamlit_Cloud-FF4B4B?style=flat)](https://eugen-goebel-smart-doc-qa-app-av3twb.streamlit.app/)
 
-> **Try it live:** [eugen-goebel-smart-doc-qa-app-av3twb.streamlit.app](https://eugen-goebel-smart-doc-qa-app-av3twb.streamlit.app/) — runs in Demo Mode (no API key required) so you can test the full RAG retrieval flow. Add your own Anthropic key in the sidebar for AI-generated answers.
+> **Try it live:** [eugen-goebel-smart-doc-qa-app-av3twb.streamlit.app](https://eugen-goebel-smart-doc-qa-app-av3twb.streamlit.app/). Runs in Demo Mode (no API key required) so you can test the full RAG retrieval flow. Add your own Anthropic key in the sidebar for AI-generated answers.
 
 ## Screenshots
 
-**Demo Mode** — clean landing view; runs without an API key using raw retrieval results
+**Demo Mode**: clean landing view; runs without an API key using raw retrieval results
 ![Landing](docs/screenshots/01-landing.png)
 
-**Question Answered** — asking about 2025 revenue returns the most relevant chunk with source reference
+**Question Answered**: asking about 2025 revenue returns the most relevant chunk with source reference
 ![Question Answered](docs/screenshots/02-question-answered.png)
 
-**Retrieved Chunks** — similarity search surfaces multiple ranked matches across the document
+**Retrieved Chunks**: similarity search surfaces multiple ranked matches across the document
 ![Retrieved Chunks](docs/screenshots/03-retrieved-chunks.png)
 
 ## How It Works
@@ -40,11 +40,11 @@ An AI-powered Retrieval-Augmented Generation (RAG) system that lets you chat wit
 
 ### RAG Pipeline
 
-1. **Document Loading** — Reads PDF, DOCX, or TXT files and extracts plain text
-2. **Chunking** — Splits text into overlapping ~500-character pieces
-3. **Embedding & Storage** — Each chunk is converted to a vector and stored in ChromaDB
-4. **Retrieval** — When you ask a question, the most relevant chunks are found via similarity search
-5. **Generation** — The LLM answers your question using only the retrieved context
+1. **Document Loading**: Reads PDF, DOCX, or TXT files and extracts plain text
+2. **Chunking**: Splits text into overlapping ~500-character pieces
+3. **Embedding & Storage**: Each chunk is converted to a vector and stored in ChromaDB
+4. **Retrieval**: When you ask a question, the most relevant chunks are found via similarity search
+5. **Generation**: The LLM answers your question using only the retrieved context
 
 ## Quick Start
 
@@ -115,7 +115,7 @@ smart-doc-qa/
 
 ### What are Embeddings?
 
-Text is converted into lists of numbers (vectors) that capture meaning. Similar texts have similar vectors. ChromaDB uses the `all-MiniLM-L6-v2` model to generate these embeddings locally — no API key needed.
+Text is converted into lists of numbers (vectors) that capture meaning. Similar texts have similar vectors. ChromaDB uses the `all-MiniLM-L6-v2` model to generate these embeddings locally, no API key needed.
 
 ### What is Chunking?
 
@@ -165,9 +165,9 @@ This app is designed to deploy in one click on **Streamlit Community Cloud** (fr
 
 The app reads the key from three places, in this order:
 
-1. `os.environ["ANTHROPIC_API_KEY"]` — set via `.env` for local runs
-2. `st.secrets["ANTHROPIC_API_KEY"]` — set in Streamlit Cloud dashboard
-3. Manual entry in the sidebar — fallback for end users
+1. `os.environ["ANTHROPIC_API_KEY"]`: set via `.env` for local runs
+2. `st.secrets["ANTHROPIC_API_KEY"]`: set in Streamlit Cloud dashboard
+3. Manual entry in the sidebar, fallback for end users
 
 If no key is provided, the app runs in **Demo Mode**: vector search still works, but the model-generated answer step is skipped and the raw retrieved chunks are shown instead.
 
