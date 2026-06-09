@@ -1,10 +1,10 @@
 """Tests for the DocumentLoader agent."""
 
 import os
-import tempfile
+
 import pytest
 
-from agents.document_loader import DocumentLoader, LoadedDocument, SUPPORTED_FORMATS
+from agents.document_loader import SUPPORTED_FORMATS, DocumentLoader, LoadedDocument
 
 
 @pytest.fixture
@@ -31,11 +31,14 @@ def empty_txt(tmp_path):
 def sample_md(tmp_path):
     """Create a temporary .md file with sample Markdown content."""
     path = tmp_path / "readme.md"
-    path.write_text("# Project Title\n\nThis is a **Markdown** document.\n\n## Section\n\n- Item one\n- Item two")
+    path.write_text(
+        "# Project Title\n\nThis is a **Markdown** document.\n\n## Section\n\n- Item one\n- Item two"
+    )
     return str(path)
 
 
 # --- Loading tests ---
+
 
 class TestDocumentLoader:
     def test_load_txt_returns_loaded_document(self, loader, sample_txt):
@@ -91,6 +94,7 @@ class TestDocumentLoader:
 
 # --- Model tests ---
 
+
 class TestLoadedDocumentModel:
     def test_model_creation(self):
         doc = LoadedDocument(
@@ -117,6 +121,7 @@ class TestLoadedDocumentModel:
 
 
 # --- Sample file test ---
+
 
 class TestSampleFile:
     def test_sample_company_report_loads(self, loader):

@@ -1,26 +1,44 @@
 """Tests for the QA Agent."""
 
-import pytest
 import uuid
 from unittest.mock import MagicMock, patch
 
-from agents.qa_agent import QAAgent, QAResponse, Source, SYSTEM_PROMPT
-from agents.vectorstore import VectorStore, SearchResult
+import pytest
+
 from agents.chunker import TextChunk
+from agents.qa_agent import SYSTEM_PROMPT, QAAgent, QAResponse, Source
+from agents.vectorstore import VectorStore
 
 
 @pytest.fixture
 def mock_store():
     """Create a vector store with sample data."""
     store = VectorStore(collection_name=f"test_{uuid.uuid4().hex[:8]}")
-    store.add_chunks([
-        TextChunk(text="The company revenue was EUR 47.3 million in 2025.",
-                  chunk_index=0, start_char=0, end_char=50, source="report.txt"),
-        TextChunk(text="The CEO is Dr. Sarah Müller, a former McKinsey partner.",
-                  chunk_index=1, start_char=50, end_char=105, source="report.txt"),
-        TextChunk(text="Main competitors are Kinaxis and o9 Solutions.",
-                  chunk_index=2, start_char=105, end_char=151, source="report.txt"),
-    ])
+    store.add_chunks(
+        [
+            TextChunk(
+                text="The company revenue was EUR 47.3 million in 2025.",
+                chunk_index=0,
+                start_char=0,
+                end_char=50,
+                source="report.txt",
+            ),
+            TextChunk(
+                text="The CEO is Dr. Sarah Müller, a former McKinsey partner.",
+                chunk_index=1,
+                start_char=50,
+                end_char=105,
+                source="report.txt",
+            ),
+            TextChunk(
+                text="Main competitors are Kinaxis and o9 Solutions.",
+                chunk_index=2,
+                start_char=105,
+                end_char=151,
+                source="report.txt",
+            ),
+        ]
+    )
     return store
 
 
@@ -33,6 +51,7 @@ def mock_anthropic_response():
 
 
 # --- QA Response model ---
+
 
 class TestQAResponseModel:
     def test_model_creation(self):
@@ -62,6 +81,7 @@ class TestQAResponseModel:
 
 # --- Source model ---
 
+
 class TestSourceModel:
     def test_source_creation(self):
         src = Source(text="Some text", source="doc.pdf", chunk_index=3)
@@ -75,6 +95,7 @@ class TestSourceModel:
 
 
 # --- QA Agent ---
+
 
 class TestQAAgent:
     @patch("agents.qa_agent.anthropic.Anthropic")
@@ -147,6 +168,7 @@ class TestQAAgent:
 
 # --- Conversation memory ---
 
+
 class TestConversationHistory:
     """ask() must forward previous turns to the LLM and cap history length."""
 
@@ -165,9 +187,7 @@ class TestConversationHistory:
         assert messages[0]["role"] == "user"
 
     @patch("agents.qa_agent.anthropic.Anthropic")
-    def test_history_is_forwarded(
-        self, mock_client_class, mock_store, mock_anthropic_response
-    ):
+    def test_history_is_forwarded(self, mock_client_class, mock_store, mock_anthropic_response):
         mock_client = mock_client_class.return_value
         mock_client.messages.create.return_value = mock_anthropic_response
 
@@ -218,10 +238,10 @@ class TestConversationHistory:
 
         history = [
             {"role": "user", "content": "ok"},
-            {"role": "system", "content": "ignored"},        # should be dropped
+            {"role": "system", "content": "ignored"},  # should be dropped
             {"role": "assistant", "content": "ok back"},
-            {"role": "user"},                                  # missing content
-            {"foo": "bar"},                                    # not a turn
+            {"role": "user"},  # missing content
+            {"foo": "bar"},  # not a turn
         ]
         agent = QAAgent(vector_store=mock_store, api_key="test-key")
         agent.ask("next?", conversation_history=history)
@@ -231,8 +251,10 @@ class TestConversationHistory:
 
     def test_demo_mode_ignores_history(self, mock_store):
         agent = QAAgent(vector_store=mock_store, demo_mode=True)
-        history = [{"role": "user", "content": "earlier"},
-                   {"role": "assistant", "content": "answer"}]
+        history = [
+            {"role": "user", "content": "earlier"},
+            {"role": "assistant", "content": "answer"},
+        ]
 
         # Should not raise even though no API client exists, and should
         # still produce a demo-mode answer with the retrieved chunks.
@@ -242,6 +264,7 @@ class TestConversationHistory:
 
 
 # --- System prompt ---
+
 
 class TestSystemPrompt:
     def test_system_prompt_exists(self):
