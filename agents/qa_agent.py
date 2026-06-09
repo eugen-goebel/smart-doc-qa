@@ -24,15 +24,16 @@ from __future__ import annotations
 import anthropic
 from pydantic import BaseModel, Field
 
-from .vectorstore import VectorStore, SearchResult
-
+from .vectorstore import SearchResult, VectorStore
 
 # ---------------------------------------------------------------------------
 # Data models
 # ---------------------------------------------------------------------------
 
+
 class Source(BaseModel):
     """A source reference for the answer."""
+
     text: str = Field(description="The relevant text snippet")
     source: str = Field(description="Source filename")
     chunk_index: int = Field(description="Chunk position in document")
@@ -47,6 +48,7 @@ class QAResponse(BaseModel):
         sources: List of text chunks that were used to generate the answer
         model:   Which AI model generated the answer
     """
+
     answer: str = Field(description="The generated answer")
     sources: list[Source] = Field(description="Source chunks used for the answer")
     model: str = Field(description="Model used for generation")
@@ -74,6 +76,7 @@ Format your answers in clear, readable prose. Use bullet points for lists."""
 # ---------------------------------------------------------------------------
 # Agent
 # ---------------------------------------------------------------------------
+
 
 class QAAgent:
     """
@@ -181,11 +184,7 @@ class QAAgent:
         else:
             # Normal mode: send to LLM API with optional conversation history
             user_message = (
-                f"Context from the user's documents:\n"
-                f"---\n"
-                f"{context}\n"
-                f"---\n\n"
-                f"Question: {question}"
+                f"Context from the user's documents:\n---\n{context}\n---\n\nQuestion: {question}"
             )
 
             messages = self._build_messages(conversation_history, user_message)
@@ -237,7 +236,7 @@ class QAAgent:
                 and isinstance(m.get("content"), str)
             ]
             # Keep the last 2*max_history_turns messages (a turn = user + assistant)
-            messages.extend(cleaned[-self.max_history_turns * 2:])
+            messages.extend(cleaned[-self.max_history_turns * 2 :])
 
         messages.append({"role": "user", "content": latest_user_message})
         return messages
@@ -282,8 +281,5 @@ class QAAgent:
         """
         parts = []
         for i, result in enumerate(results, 1):
-            parts.append(
-                f"[Chunk {i} | Source: {result.source}]\n"
-                f"{result.text}\n"
-            )
+            parts.append(f"[Chunk {i} | Source: {result.source}]\n{result.text}\n")
         return "\n".join(parts)

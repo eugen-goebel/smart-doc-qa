@@ -25,10 +25,10 @@ import tempfile
 import streamlit as st
 from dotenv import load_dotenv
 
-from agents.document_loader import DocumentLoader
 from agents.chunker import TextChunker
-from agents.vectorstore import VectorStore, DEFAULT_PERSIST_DIR
+from agents.document_loader import DocumentLoader
 from agents.qa_agent import QAAgent
+from agents.vectorstore import DEFAULT_PERSIST_DIR, VectorStore
 
 # Load environment variables (for ANTHROPIC_API_KEY)
 load_dotenv()
@@ -52,6 +52,7 @@ st.set_page_config(
 # "Session state" lets us keep data between reruns (like a mini-database
 # that lives as long as the browser tab is open).
 # ---------------------------------------------------------------------------
+
 
 def init_session_state():
     """Initialize session state variables if they don't exist yet."""
@@ -117,7 +118,10 @@ with st.sidebar:
 
     # "Load sample" button for quick testing
     sample_path = os.path.join(os.path.dirname(__file__), "data", "sample_company_report.txt")
-    if os.path.exists(sample_path) and "sample_company_report.txt" not in st.session_state.uploaded_files:
+    if (
+        os.path.exists(sample_path)
+        and "sample_company_report.txt" not in st.session_state.uploaded_files
+    ):
         if st.button("📋 Load sample document"):
             with st.spinner("Loading sample..."):
                 loader = DocumentLoader()
@@ -200,7 +204,9 @@ if demo_mode:
         "The vector search finds relevant passages. Add an API key for full AI-generated answers."
     )
 else:
-    st.caption("Ask questions about your uploaded documents. Answers are based only on the document content.")
+    st.caption(
+        "Ask questions about your uploaded documents. Answers are based only on the document content."
+    )
 
 # Display chat history
 for msg in st.session_state.messages:
@@ -228,7 +234,11 @@ if prompt := st.chat_input("Ask a question about your documents..."):
 
     # Generate answer
     with st.chat_message("assistant"):
-        with st.spinner("Searching documents..." if demo_mode else "Searching documents and generating answer..."):
+        with st.spinner(
+            "Searching documents..."
+            if demo_mode
+            else "Searching documents and generating answer..."
+        ):
             agent = QAAgent(
                 vector_store=st.session_state.vector_store,
                 api_key=api_key if not demo_mode else None,
@@ -254,8 +264,10 @@ if prompt := st.chat_input("Ask a question about your documents..."):
                     st.caption(src.text)
 
     # Save to chat history
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": response.answer,
-        "sources": [s.model_dump() for s in response.sources] if not demo_mode else [],
-    })
+    st.session_state.messages.append(
+        {
+            "role": "assistant",
+            "content": response.answer,
+            "sources": [s.model_dump() for s in response.sources] if not demo_mode else [],
+        }
+    )

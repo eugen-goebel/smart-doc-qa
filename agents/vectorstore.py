@@ -36,6 +36,7 @@ DEFAULT_PERSIST_DIR = ".chroma_data"
 # Data model
 # ---------------------------------------------------------------------------
 
+
 class SearchResult(BaseModel):
     """
     A single search result from the vector store.
@@ -46,6 +47,7 @@ class SearchResult(BaseModel):
         chunk_index: Position of this chunk in the original document
         distance:   How "far" this result is from the query (lower = better match)
     """
+
     text: str = Field(description="The matching chunk text")
     source: str = Field(description="Source filename")
     chunk_index: int = Field(description="Chunk position in document")
@@ -55,6 +57,7 @@ class SearchResult(BaseModel):
 # ---------------------------------------------------------------------------
 # Agent
 # ---------------------------------------------------------------------------
+
 
 class VectorStore:
     """
@@ -164,12 +167,14 @@ class VectorStore:
         # We only query one thing, so we take index [0]
         search_results = []
         for i in range(len(results["documents"][0])):
-            search_results.append(SearchResult(
-                text=results["documents"][0][i],
-                source=results["metadatas"][0][i]["source"],
-                chunk_index=results["metadatas"][0][i]["chunk_index"],
-                distance=round(results["distances"][0][i], 4),
-            ))
+            search_results.append(
+                SearchResult(
+                    text=results["documents"][0][i],
+                    source=results["metadatas"][0][i]["source"],
+                    chunk_index=results["metadatas"][0][i]["chunk_index"],
+                    distance=round(results["distances"][0][i], 4),
+                )
+            )
 
         return search_results
 

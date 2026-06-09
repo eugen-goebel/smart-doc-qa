@@ -26,10 +26,10 @@ This way, no sentence is split without context.
 
 from pydantic import BaseModel, Field
 
-
 # ---------------------------------------------------------------------------
 # Data model
 # ---------------------------------------------------------------------------
+
 
 class TextChunk(BaseModel):
     """
@@ -42,6 +42,7 @@ class TextChunk(BaseModel):
         end_char:   Character offset where this chunk ends
         source:     Filename this chunk came from
     """
+
     text: str = Field(description="The chunk text content")
     chunk_index: int = Field(description="Position of this chunk (0-based)")
     start_char: int = Field(description="Start character position in original text")
@@ -52,6 +53,7 @@ class TextChunk(BaseModel):
 # ---------------------------------------------------------------------------
 # Agent
 # ---------------------------------------------------------------------------
+
 
 class TextChunker:
     """
@@ -113,13 +115,15 @@ class TextChunker:
 
             # Only keep chunks that have actual content
             if chunk_text:
-                chunks.append(TextChunk(
-                    text=chunk_text,
-                    chunk_index=index,
-                    start_char=position,
-                    end_char=end,
-                    source=source,
-                ))
+                chunks.append(
+                    TextChunk(
+                        text=chunk_text,
+                        chunk_index=index,
+                        start_char=position,
+                        end_char=end,
+                        source=source,
+                    )
+                )
                 index += 1
 
             # Move forward by one step

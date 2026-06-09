@@ -12,14 +12,15 @@ Supported formats:
 """
 
 import os
-from pypdf import PdfReader
+
 from docx import Document
 from pydantic import BaseModel, Field
-
+from pypdf import PdfReader
 
 # ---------------------------------------------------------------------------
 # Data model — describes what we know about a loaded document
 # ---------------------------------------------------------------------------
+
 
 class LoadedDocument(BaseModel):
     """
@@ -32,6 +33,7 @@ class LoadedDocument(BaseModel):
         page_count: Number of pages (only meaningful for PDFs)
         char_count: Total number of characters in the text
     """
+
     filename: str = Field(description="Original filename")
     format: str = Field(description="File format: pdf, docx, txt, or md")
     text: str = Field(description="Full extracted text")
@@ -49,6 +51,7 @@ SUPPORTED_FORMATS = {".pdf", ".docx", ".txt", ".md"}
 # ---------------------------------------------------------------------------
 # Agent
 # ---------------------------------------------------------------------------
+
 
 class DocumentLoader:
     """
@@ -83,8 +86,7 @@ class DocumentLoader:
         ext = os.path.splitext(filepath)[1].lower()
         if ext not in SUPPORTED_FORMATS:
             raise ValueError(
-                f"Unsupported format: '{ext}'. "
-                f"Use one of: {', '.join(sorted(SUPPORTED_FORMATS))}"
+                f"Unsupported format: '{ext}'. Use one of: {', '.join(sorted(SUPPORTED_FORMATS))}"
             )
 
         # --- Step 3: Read the file using the appropriate method ---
@@ -135,12 +137,12 @@ class DocumentLoader:
 
     def _read_txt(self, filepath: str) -> tuple[str, int]:
         """Read a plain text file."""
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(filepath, encoding="utf-8") as f:
             text = f.read()
         return text, 1
 
     def _read_md(self, filepath: str) -> tuple[str, int]:
         """Read a Markdown file. Markdown is already human-readable plain text."""
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(filepath, encoding="utf-8") as f:
             text = f.read()
         return text, 1
