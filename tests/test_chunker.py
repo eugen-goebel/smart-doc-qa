@@ -2,7 +2,7 @@
 
 import pytest
 
-from agents.chunker import TextChunker, TextChunk
+from agents.chunker import TextChunk, TextChunker
 
 
 @pytest.fixture
@@ -17,6 +17,7 @@ def long_text():
 
 
 # --- Basic chunking ---
+
 
 class TestChunking:
     def test_chunk_returns_list(self, chunker):
@@ -57,6 +58,7 @@ class TestChunking:
 
 # --- Overlap behavior ---
 
+
 class TestOverlap:
     def test_chunks_overlap(self):
         chunker = TextChunker(chunk_size=50, overlap=10)
@@ -78,6 +80,7 @@ class TestOverlap:
 
 # --- Validation ---
 
+
 class TestValidation:
     def test_invalid_chunk_size(self):
         with pytest.raises(ValueError):
@@ -93,6 +96,7 @@ class TestValidation:
 
 
 # --- Model tests ---
+
 
 class TestTextChunkModel:
     def test_model_creation(self):
