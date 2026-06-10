@@ -14,7 +14,7 @@ An AI-powered Retrieval-Augmented Generation (RAG) system that lets you chat wit
 
 ## Screenshots
 
-**Demo Mode**: clean landing view; runs without an API key using raw retrieval results
+**Demo Mode**: clean landing view, runs without an API key using raw retrieval results
 ![Landing](docs/screenshots/01-landing.png)
 
 **Question Answered**: asking about 2025 revenue returns the most relevant chunk with source reference
