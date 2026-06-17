@@ -11,6 +11,6 @@ pytest>=9.1.0
 # tracing deps don't trip _CheckCalledFromGeneratedFile on Streamlit
 # Cloud. The older opentelemetry-proto _pb2 files were generated with
 # a protoc that's incompatible with protobuf 5.x.
-opentelemetry-proto>=1.27.0
+opentelemetry-proto>=1.42.1
 opentelemetry-exporter-otlp-proto-grpc>=1.42.1
 protobuf>=5.27.0
