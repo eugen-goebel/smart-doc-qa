@@ -25,7 +25,6 @@ ChromaDB handles the embedding automatically using a built-in model
 """
 
 import chromadb
-from chromadb.config import Settings
 from pydantic import BaseModel, Field
 
 from .chunker import TextChunk
@@ -81,13 +80,10 @@ class VectorStore:
             persist_dir: Directory to save the database (None = in-memory only)
             collection_name: Name for the ChromaDB collection
         """
-        # Disable anonymized telemetry: its background thread has been
-        # implicated in chromadb client-teardown races on Streamlit Cloud.
-        settings = Settings(anonymized_telemetry=False)
         if persist_dir:
-            self._client = chromadb.PersistentClient(path=persist_dir, settings=settings)
+            self._client = chromadb.PersistentClient(path=persist_dir)
         else:
-            self._client = chromadb.EphemeralClient(settings=settings)
+            self._client = chromadb.EphemeralClient()
 
         # get_or_create: if the collection exists, reuse it; otherwise create it
         self._collection = self._client.get_or_create_collection(
