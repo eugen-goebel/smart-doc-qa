@@ -54,11 +54,23 @@ st.set_page_config(
 # ---------------------------------------------------------------------------
 
 
+@st.cache_resource
+def get_vector_store(persist_dir: str) -> VectorStore:
+    """Create the ChromaDB-backed store once and reuse it across sessions.
+
+    Streamlit runs many sessions in a single process, and chromadb keeps a
+    process-global registry of clients, so building a new client per session
+    can race on that registry. Caching the store as a shared resource creates
+    the client exactly once.
+    """
+    return VectorStore(persist_dir=persist_dir)
+
+
 def init_session_state():
     """Initialize session state variables if they don't exist yet."""
     if "vector_store" not in st.session_state:
         persist_dir = os.environ.get("CHROMA_PERSIST_DIR", DEFAULT_PERSIST_DIR)
-        st.session_state.vector_store = VectorStore(persist_dir=persist_dir)
+        st.session_state.vector_store = get_vector_store(persist_dir)
     if "messages" not in st.session_state:
         st.session_state.messages = []
     if "uploaded_files" not in st.session_state:
