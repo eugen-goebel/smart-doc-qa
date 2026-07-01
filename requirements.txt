@@ -12,5 +12,5 @@ pytest>=9.1.1
 # Cloud. The older opentelemetry-proto _pb2 files were generated with
 # a protoc that's incompatible with protobuf 5.x.
 opentelemetry-proto>=1.43.0
-opentelemetry-exporter-otlp-proto-grpc>=1.42.1
+opentelemetry-exporter-otlp-proto-grpc>=1.43.0
 protobuf>=7.35.1
