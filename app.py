@@ -54,6 +54,9 @@ st.set_page_config(
 # ---------------------------------------------------------------------------
 
 
+SAMPLE_DOC_NAME = "sample_company_report.txt"
+
+
 def init_session_state():
     """Initialize session state variables if they don't exist yet."""
     if "vector_store" not in st.session_state:
@@ -68,7 +71,38 @@ def init_session_state():
         st.session_state.total_chunks = st.session_state.vector_store.count
 
 
+def load_sample_document() -> bool:
+    """Index the bundled sample document. Returns True if it was loaded."""
+    sample_path = os.path.join(os.path.dirname(__file__), "data", SAMPLE_DOC_NAME)
+    if not os.path.exists(sample_path):
+        return False
+
+    loader = DocumentLoader()
+    chunker = TextChunker(chunk_size=500, overlap=100)
+
+    doc = loader.load(sample_path)
+    chunks = chunker.chunk(doc.text, source=SAMPLE_DOC_NAME)
+    st.session_state.vector_store.add_chunks(chunks)
+    st.session_state.total_chunks += len(chunks)
+    st.session_state.uploaded_files.append(SAMPLE_DOC_NAME)
+    return True
+
+
+def autoload_sample_once():
+    """Preload the sample document so the demo works on first visit.
+
+    Runs at most once per session, and only while the store is empty, so
+    clearing all documents is not immediately undone by a reload.
+    """
+    if st.session_state.get("sample_autoloaded"):
+        return
+    st.session_state.sample_autoloaded = True
+    if not st.session_state.uploaded_files:
+        load_sample_document()
+
+
 init_session_state()
+autoload_sample_once()
 
 
 # ---------------------------------------------------------------------------
@@ -117,21 +151,11 @@ with st.sidebar:
     )
 
     # "Load sample" button for quick testing
-    sample_path = os.path.join(os.path.dirname(__file__), "data", "sample_company_report.txt")
-    if (
-        os.path.exists(sample_path)
-        and "sample_company_report.txt" not in st.session_state.uploaded_files
-    ):
+    sample_path = os.path.join(os.path.dirname(__file__), "data", SAMPLE_DOC_NAME)
+    if os.path.exists(sample_path) and SAMPLE_DOC_NAME not in st.session_state.uploaded_files:
         if st.button("📋 Load sample document"):
             with st.spinner("Loading sample..."):
-                loader = DocumentLoader()
-                chunker = TextChunker(chunk_size=500, overlap=100)
-
-                doc = loader.load(sample_path)
-                chunks = chunker.chunk(doc.text, source="sample_company_report.txt")
-                st.session_state.vector_store.add_chunks(chunks)
-                st.session_state.total_chunks += len(chunks)
-                st.session_state.uploaded_files.append("sample_company_report.txt")
+                load_sample_document()
                 st.rerun()
 
     # Process uploaded files
@@ -200,8 +224,8 @@ st.title("Smart Document Q&A")
 
 if demo_mode:
     st.caption(
-        "**Demo Mode** — Upload a document, then ask questions. "
-        "The vector search finds relevant passages. Add an API key for full AI-generated answers."
+        "**Demo Mode** — A sample company report is preloaded, just ask a question. "
+        "Upload your own documents anytime. Add an API key for full AI-generated answers."
     )
 else:
     st.caption(
@@ -224,7 +248,7 @@ for msg in st.session_state.messages:
 if prompt := st.chat_input("Ask a question about your documents..."):
     # Check prerequisites
     if not st.session_state.uploaded_files:
-        st.error("Please upload at least one document first.")
+        st.error("Please upload a document first, or click 'Load sample document' in the sidebar.")
         st.stop()
 
     # Show user message
