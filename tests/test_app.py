@@ -37,6 +37,16 @@ class TestSampleAutoload:
         roles = [m["role"] for m in app.session_state["messages"]]
         assert roles[-2:] == ["user", "assistant"]
 
+    def test_example_question_buttons_are_shown_and_answerable(self, app):
+        example_buttons = [b for b in app.button if b.label.endswith("?")]
+        assert example_buttons, "expected example question buttons on first visit"
+
+        example_buttons[0].click().run()
+
+        assert not app.exception
+        roles = [m["role"] for m in app.session_state["messages"]]
+        assert roles[-2:] == ["user", "assistant"]
+
     def test_clear_all_is_not_undone_by_autoload(self, app):
         clear = next(b for b in app.button if "Clear all documents" in b.label)
         clear.click().run()

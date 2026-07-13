@@ -232,6 +232,19 @@ else:
         "Ask questions about your uploaded documents. Answers are based only on the document content."
     )
 
+# Example questions — shown on first visit so the demo is instantly explorable
+EXAMPLE_QUESTIONS = [
+    "What was the company's revenue in 2025?",
+    "Who are the key executives?",
+    "How did the team grow in 2025?",
+]
+if demo_mode and st.session_state.uploaded_files and not st.session_state.messages:
+    st.caption("Try one of these:")
+    for col, question in zip(st.columns(len(EXAMPLE_QUESTIONS)), EXAMPLE_QUESTIONS, strict=True):
+        if col.button(question, use_container_width=True):
+            st.session_state.pending_question = question
+            st.rerun()
+
 # Display chat history
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
@@ -244,8 +257,10 @@ for msg in st.session_state.messages:
                     st.markdown(f"**{src['source']}** (Chunk {src['chunk_index']})")
                     st.caption(src["text"])
 
-# Chat input
-if prompt := st.chat_input("Ask a question about your documents..."):
+# Chat input — a question can come from the box or from an example button
+typed = st.chat_input("Ask a question about your documents...")
+prompt = typed or st.session_state.pop("pending_question", None)
+if prompt:
     # Check prerequisites
     if not st.session_state.uploaded_files:
         st.error("Please upload a document first, or click 'Load sample document' in the sidebar.")
@@ -295,3 +310,18 @@ if prompt := st.chat_input("Ask a question about your documents..."):
             "sources": [s.model_dump() for s in response.sources] if not demo_mode else [],
         }
     )
+
+
+# ---------------------------------------------------------------------------
+# Footer
+# ---------------------------------------------------------------------------
+
+st.divider()
+st.markdown(
+    "<div style='text-align:center; color:gray; font-size:0.85rem;'>"
+    "Built by Eugen Goebel &middot; "
+    "<a href='https://github.com/eugen-goebel' target='_blank'>GitHub</a> &middot; "
+    "<a href='https://www.linkedin.com/in/eugen-goebel/' target='_blank'>LinkedIn</a>"
+    "</div>",
+    unsafe_allow_html=True,
+)
