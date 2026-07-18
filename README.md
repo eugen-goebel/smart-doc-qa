@@ -87,10 +87,11 @@ smart-doc-qa/
 ├── data/
 │   └── sample_company_report.txt   # Sample document for testing
 ├── tests/
-│   ├── test_document_loader.py     # 10 tests
+│   ├── test_document_loader.py     # 12 tests
 │   ├── test_chunker.py             # 15 tests
-│   ├── test_vectorstore.py         # 16 tests
-│   └── test_qa_agent.py            # 14 tests
+│   ├── test_vectorstore.py         # 24 tests
+│   ├── test_qa_agent.py            # 19 tests
+│   └── test_app.py                 # 5 tests
 ├── requirements.txt
 └── README.md
 ```
