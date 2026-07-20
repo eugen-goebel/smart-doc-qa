@@ -232,7 +232,25 @@ else:
         "Ask questions about your uploaded documents. Answers are based only on the document content."
     )
 
-# Example questions — shown on first visit so the demo is instantly explorable
+# A short explainer so a first-time visitor understands what RAG buys them,
+# even after a single question. Shown in demo mode, stays visible across turns.
+if demo_mode:
+    with st.expander("ℹ️ How this works, and why it is useful"):
+        st.markdown(
+            "This app answers with **retrieval-augmented generation (RAG)**:\n\n"
+            "1. Each document is split into small **chunks** that are turned into "
+            "numeric **embeddings** and stored in a vector database.\n"
+            "2. Your question is embedded the same way, so the app can retrieve the "
+            "passages closest **in meaning** — not just keyword matches.\n"
+            "3. With an API key, Claude writes a grounded answer and cites its sources. "
+            "In demo mode you see the retrieved passages directly.\n\n"
+            "The payoff grows with document size: instead of reading a long report, you "
+            "ask and it retrieves the relevant passages. The preloaded file is a full "
+            "multi-section annual report, so ask about any part of it — the financials, "
+            "the customers, the team, the risks, or the 2026 plan."
+        )
+
+# Example questions — shown on first visit so the demo is instantly explorable.
 EXAMPLE_QUESTIONS = [
     "What was the company's revenue in 2025?",
     "Who are the key executives?",
