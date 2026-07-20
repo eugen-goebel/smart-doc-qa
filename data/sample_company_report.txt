@@ -1,6 +1,11 @@
 NovaTech Solutions GmbH — Annual Report 2025
 =============================================
 
+This report covers the 2025 fiscal year (1 January to 31 December 2025) and is
+intended for shareholders, employees, and prospective partners. It is a
+synthetic sample document used to demonstrate document question-answering.
+
+
 1. Company Overview
 -------------------
 NovaTech Solutions GmbH is a German technology company founded in 2018 and
@@ -13,6 +18,24 @@ The company's core product is "OptiFlow," a cloud-based platform that uses
 machine learning to optimize supply chain operations. OptiFlow serves over
 180 enterprise customers in 12 countries, primarily in the DACH region
 (Germany, Austria, Switzerland) and Scandinavia.
+
+Mission: NovaTech's mission is to make industrial supply chains self-optimizing,
+so that planners spend their time on decisions rather than on spreadsheets.
+
+Company timeline:
+  - 2018: Founded in Munich by Dr. Sarah Müller and Marcus Weber
+  - 2019: First paying customer (a Bavarian automotive supplier); seed round
+  - 2020: OptiFlow Core launched; team reaches 25 people
+  - 2021: Series A (EUR 8 million); expansion into Austria and Switzerland
+  - 2022: OptiFlow Analytics launched; first Scandinavian customers
+  - 2023: Hamburg office opened; SOC 2 Type I achieved
+  - 2024: Crossed EUR 36 million in revenue; 180 customers
+  - 2025: Series B (EUR 35 million); first full year of profitability
+
+Legal form: Gesellschaft mit beschränkter Haftung (GmbH), registered with the
+Amtsgericht München under HRB 240815. VAT ID: DE315000000. Fiscal year ends
+31 December. Auxiliary entities: NovaTech Nordic AB (Stockholm, established 2023).
+
 
 2. Financial Performance
 -------------------------
@@ -28,6 +51,38 @@ NovaTech achieved significant growth in fiscal year 2025:
 Revenue growth was driven by strong expansion in the Scandinavian market (+58%)
 and successful upselling of the new "OptiFlow Analytics" module to existing
 customers. The average contract value increased by 22% to EUR 212,000 per year.
+
+Quarterly revenue in 2025:
+  - Q1: EUR 10.4 million
+  - Q2: EUR 11.3 million
+  - Q3: EUR 12.1 million
+  - Q4: EUR 13.5 million
+
+Revenue by region:
+  - Germany: EUR 26.8 million (57%)
+  - Rest of DACH (Austria, Switzerland): EUR 7.1 million (15%)
+  - Scandinavia: EUR 9.9 million (21%)
+  - Rest of Europe: EUR 3.5 million (7%)
+
+SaaS metrics:
+  - Annual Recurring Revenue (ARR) at year end: EUR 41.0 million
+  - Net Revenue Retention (NRR): 118%
+  - Gross Revenue Retention: 94%
+  - Logo churn: 6 customers lost in 2025 (3.2% of the base)
+  - Customer Acquisition Cost (CAC): EUR 48,000 per new logo
+  - CAC payback period: 14 months
+  - Lifetime Value to CAC ratio (LTV/CAC): 4.6x
+
+Cost structure (as a share of revenue):
+  - Cost of revenue: 27.6%
+  - Research and development: 24.0% (EUR 11.4 million)
+  - Sales and marketing: 31.0%
+  - General and administrative: 12.0%
+
+The finance team maintains 18 months of cash runway at the current burn, though
+the company reached operating profitability in Q3 2025 and no longer depends on
+external funding for day-to-day operations.
+
 
 3. Product & Technology
 ------------------------
@@ -49,11 +104,37 @@ Key technology milestones in 2025:
   - Achieved SOC 2 Type II and ISO 27001 certifications
   - Released public API v3 with GraphQL support
 
+Reliability and operations:
+  - Platform uptime in 2025: 99.95% (contractual SLA: 99.9%)
+  - Two production regions: eu-central-1 (Frankfurt) and eu-north-1 (Stockholm)
+  - Recovery Time Objective (RTO): 1 hour; Recovery Point Objective (RPO): 5 minutes
+  - Median forecast API response time: 180 milliseconds
+  - Data residency: all customer data stored within the EU
+
+Security and compliance certifications held at year end:
+  - SOC 2 Type II
+  - ISO/IEC 27001:2022
+  - ISO/IEC 27017 (cloud security)
+  - GDPR-compliant, with a GDPR-native data architecture
+  - Annual third-party penetration testing (last report: October 2025, no critical findings)
+
+2026 product roadmap highlights:
+  - OptiFlow Autonomous: fully automated purchasing recommendations (private beta Q2)
+  - Multi-tenant data warehouse for cross-customer benchmarking (opt-in)
+  - Native mobile app for supply chain alerts
+  - Expanded connector library: Infor, Epicor, and Blue Yonder integrations
+
+
 4. Market & Competition
 ------------------------
 NovaTech operates in the supply chain management (SCM) software market, which
 is projected to grow from USD 19.3 billion in 2024 to USD 37.4 billion by 2030
 (CAGR of 11.7%, according to MarketsAndMarkets).
+
+Market sizing for NovaTech:
+  - Total Addressable Market (TAM): USD 37.4 billion by 2030
+  - Serviceable Addressable Market (SAM): USD 4.2 billion (DACH + Nordics, mid-market and enterprise)
+  - Serviceable Obtainable Market (SOM): USD 480 million (near-term target segments)
 
 Key Competitors:
   - Kinaxis (Canada): Market leader in concurrent planning; larger but less AI-focused
@@ -67,6 +148,11 @@ NovaTech's competitive advantages:
   3. Strong integration with SAP (critical for German Mittelstand customers)
   4. Carbon tracking module addresses growing ESG requirements
 
+Positioning: NovaTech targets the mid-market and lower enterprise segment
+(EUR 200 million to EUR 5 billion in annual revenue) where large incumbents are
+too expensive and generic tools are too shallow.
+
+
 5. Customers & Use Cases
 -------------------------
 Key customer segments:
@@ -75,6 +161,12 @@ Key customer segments:
   - Retail & Consumer (19%): Zalando, REWE Group
   - Logistics (17%): DHL Supply Chain, DB Schenker
   - Pharmaceuticals (12%): Boehringer Ingelheim, Fresenius
+
+Customer metrics:
+  - Total active customers: 184
+  - Net Promoter Score (NPS): 61
+  - Average time-to-value (first measurable saving): 90 days
+  - Customers on multi-year contracts: 71%
 
 Case Study — BMW Group:
   BMW deployed OptiFlow across 8 production plants in 2024. Results after 12 months:
@@ -88,6 +180,14 @@ Case Study — Zalando:
     - 18% reduction in overstock markdowns
     - Seasonal planning cycle reduced from 6 weeks to 10 days
 
+Case Study — Boehringer Ingelheim:
+  The pharmaceutical group uses OptiFlow to manage temperature-sensitive
+  logistics for 40+ distribution routes.
+    - 27% fewer cold-chain excursions
+    - Full audit trail for regulatory compliance (GxP)
+    - Planning effort reduced by two full-time equivalents
+
+
 6. Team & Culture
 ------------------
 Leadership:
@@ -95,14 +195,104 @@ Leadership:
   - CTO: Marcus Weber (ex-Google, built ML infrastructure at Celonis)
   - CFO: Lisa Chen (former VP Finance at Personio)
   - VP Sales: Thomas Richter (ex-SAP, 20 years in enterprise sales)
+  - VP People: Anja Kowalski (former Head of HR at a Berlin scale-up)
+  - VP Customer Success: Daniel Okonkwo (ex-Salesforce, joined 2023)
 
 The team grew from 218 employees in January 2025 to 342 by December 2025 (+57%).
 Key hiring areas: ML Engineers (38 hires), Sales (26 hires), Customer Success (18 hires).
 
+Workforce breakdown by function:
+  - Engineering and ML: 41%
+  - Sales and Marketing: 24%
+  - Customer Success and Support: 18%
+  - Operations, Finance, and G&A: 12%
+  - Leadership: 5%
+
 Employee satisfaction score: 4.3/5.0 on Kununu (above industry average of 3.7).
 Voluntary turnover rate: 8.2% (industry average: 14.5%).
 
-7. Strategy & Outlook 2026
+Diversity and inclusion:
+  - Women in the overall workforce: 38%
+  - Women in engineering roles: 29%
+  - Women in leadership (VP and above): 33%
+  - 31 nationalities represented across three offices
+  - Target: 35% women in engineering by end of 2027
+
+Compensation and benefits:
+  - All employees participate in a virtual stock option plan (VSOP)
+  - Hybrid work: minimum two office days per week, four "work from anywhere" weeks per year
+  - Annual learning budget of EUR 1,500 per employee
+
+
+7. Corporate Governance
+------------------------
+The management team reports to a five-member advisory board that meets quarterly.
+
+Board of Directors and Advisors:
+  - Chair: Prof. Dr. Heinrich Baumann (former CIO of a DAX-listed manufacturer)
+  - Earlybird Venture Capital representative (Series B lead investor)
+  - HV Capital representative
+  - Accel representative
+  - One independent industry advisor (rotating; 2025: a former Kinaxis executive)
+
+Governance practices:
+  - Quarterly board reporting with audited management accounts
+  - Whistleblower policy and anonymous reporting channel introduced in 2025
+  - Annual external financial audit (auditor: a Big Four firm's Munich office)
+
+
+8. Legal, Intellectual Property, and Compliance
+------------------------------------------------
+Intellectual property:
+  - Two granted patents (demand-sensing method; anomaly detection in supply signals)
+  - Three patent applications pending at the European Patent Office
+  - "OptiFlow" is a registered EU trademark (EUIPO)
+
+Data protection:
+  - Data Processing Agreements (DPAs) in place with all customers
+  - Appointed Data Protection Officer (external, a specialised Munich law firm)
+  - All sub-processors listed publicly; standard contractual clauses for any non-EU transfers
+
+Regulatory outlook:
+  - EU AI Act: OptiFlow's forecasting models are classified as limited-risk;
+    the company maintains model documentation and human-oversight controls
+  - No material litigation is pending or threatened as of the reporting date
+  - One minor trademark opposition (2024) was resolved amicably in early 2025
+
+
+9. Sustainability and ESG
+--------------------------
+NovaTech published its first voluntary sustainability report alongside these
+financials.
+
+Environmental:
+  - Scope 1 and 2 emissions: 210 tonnes CO2e (offices and cloud, market-based)
+  - Cloud workloads run in AWS regions on majority-renewable energy
+  - OptiFlow Green helped customers report on an estimated 1.2 million tonnes
+    CO2e of tracked supply-chain emissions in 2025
+  - Target: net-zero for Scope 1 and 2 by 2030
+
+Social:
+  - Living-wage commitment for all employees and on-site contractors
+  - Partnership with two German universities for ML internships (14 interns in 2025)
+
+Governance: covered in Section 7 above.
+
+
+10. Partnerships and Ecosystem
+-------------------------------
+Technology and channel partnerships:
+  - SAP: OptiFlow Connect is certified for SAP integration; NovaTech is pursuing
+    certified SAP BTP solution status in 2026
+  - AWS: Advanced Technology Partner; co-selling motion in the DACH region
+  - Microsoft: Azure Marketplace listing for Microsoft-centric customers
+  - System integrators: two regional SI partners deliver implementation services
+
+Partner-sourced revenue accounted for 19% of new bookings in 2025, up from 11%
+in 2024.
+
+
+11. Strategy & Outlook 2026
 ----------------------------
 Strategic priorities for 2026:
   1. International expansion: Enter the UK and Benelux markets (target: 40 new customers)
@@ -116,10 +306,18 @@ Funding:
   Earlybird Venture Capital with participation from HV Capital and existing
   investor Accel. Total funding to date: EUR 52 million.
 
+Ownership after the Series B (fully diluted, approximate):
+  - Founders and employees (incl. option pool): 46%
+  - Earlybird Venture Capital: 21%
+  - HV Capital: 14%
+  - Accel: 13%
+  - Angel investors and others: 6%
+
 The company is evaluating a potential Series C round in late 2026 or an IPO
 on the Frankfurt Stock Exchange in 2027, depending on market conditions.
 
-8. Risks & Challenges
+
+12. Risks & Challenges
 ----------------------
   - Talent competition: Hiring ML engineers in Germany remains difficult
   - Enterprise sales cycles: Average 6-9 months; longer in pharma (12+ months)
@@ -127,3 +325,21 @@ on the Frankfurt Stock Exchange in 2027, depending on market conditions.
   - Technology risk: Rapid evolution of LLMs could disrupt existing ML approaches
   - Concentration risk: Top 10 customers represent 41% of recurring revenue
   - Regulatory: EU AI Act compliance requires ongoing investment
+  - Key-person risk: The founding CEO and CTO remain central to product direction
+
+
+13. Key Metrics at a Glance (2025)
+-----------------------------------
+  - Total Revenue: EUR 47.3 million (+31% year over year)
+  - ARR at year end: EUR 41.0 million
+  - Gross Margin: 72.4%
+  - EBITDA: EUR 8.1 million (17.1% margin)
+  - Net Income: EUR 3.4 million
+  - Cash: EUR 22.7 million, no debt
+  - Customers: 184 (12 countries)
+  - Net Revenue Retention: 118%
+  - Employees: 342 (up from 218)
+  - Platform uptime: 99.95%
+  - NPS: 61
+
+End of report. All figures are illustrative and for demonstration only.
