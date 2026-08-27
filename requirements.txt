@@ -1,4 +1,4 @@
-anthropic>=0.122.0
+anthropic>=1.0.0
 streamlit>=1.61.1
 chromadb>=1.5.9
 pypdf>=6.16.2
