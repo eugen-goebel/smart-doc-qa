@@ -1,3 +1,32 @@
+[project]
+name = "smart-doc-qa"
+version = "1.0.0"
+description = "Retrieval augmented document question answering with a Streamlit interface and a ChromaDB vector store"
+requires-python = ">=3.11"
+dependencies = [
+    "anthropic>=0.122.0",
+    "streamlit>=1.61.1",
+    "chromadb>=1.5.9",
+    "pypdf>=6.16.2",
+    "python-docx>=1.2.0",
+    "python-dotenv>=1.2.3",
+    "pydantic>=2.13.4",
+    # Pin opentelemetry-proto and protobuf so chromadb's transitive tracing
+    # deps don't trip _CheckCalledFromGeneratedFile on Streamlit Cloud. The
+    # older opentelemetry-proto _pb2 files were generated with a protoc that
+    # is incompatible with protobuf 5.x.
+    "opentelemetry-proto>=1.44.0",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.44.0",
+    "protobuf>=7.36.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.16.4",
+]
+
 [tool.ruff]
 line-length = 100
 target-version = "py310"
