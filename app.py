@@ -259,7 +259,7 @@ EXAMPLE_QUESTIONS = [
 if demo_mode and st.session_state.uploaded_files and not st.session_state.messages:
     st.caption("Try one of these:")
     for col, question in zip(st.columns(len(EXAMPLE_QUESTIONS)), EXAMPLE_QUESTIONS, strict=True):
-        if col.button(question, use_container_width=True):
+        if col.button(question, width="stretch"):
             st.session_state.pending_question = question
             st.rerun()
 
