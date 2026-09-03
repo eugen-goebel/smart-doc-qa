@@ -24,6 +24,29 @@ def app(tmp_path, monkeypatch):
     return at
 
 
+class TestFooterPlacement:
+    """The footer must not strand itself in the middle of the page.
+
+    Regression: st.chat_input is pinned to the bottom of the viewport, so a
+    footer in the normal page flow rendered directly under the example
+    buttons with a large empty gap below it.
+    """
+
+    def test_footer_lives_in_the_sidebar(self, app):
+        assert not app.exception
+
+        def has_footer(blocks):
+            return any("Built by Eugen Goebel" in b.value for b in blocks)
+
+        assert has_footer(app.sidebar.markdown), "footer missing from the sidebar"
+        assert not has_footer(app.main.markdown), "footer must not sit in the main column"
+
+    def test_footer_still_links_the_portfolio(self, app):
+        footer = next(b for b in app.sidebar.markdown if "Built by Eugen Goebel" in b.value)
+        assert "github.com/eugen-goebel" in footer.value
+        assert "linkedin.com/in/eugen-goebel" in footer.value
+
+
 class TestSampleAutoload:
     def test_fresh_session_preloads_the_sample(self, app):
         assert not app.exception

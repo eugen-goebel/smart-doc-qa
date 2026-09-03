@@ -334,12 +334,18 @@ if prompt:
 # Footer
 # ---------------------------------------------------------------------------
 
-st.divider()
-st.markdown(
-    "<div style='text-align:center; color:gray; font-size:0.85rem;'>"
-    "Built by Eugen Goebel &middot; "
-    "<a href='https://github.com/eugen-goebel' target='_blank'>GitHub</a> &middot; "
-    "<a href='https://www.linkedin.com/in/eugen-goebel/' target='_blank'>LinkedIn</a>"
-    "</div>",
-    unsafe_allow_html=True,
-)
+# st.chat_input is pinned to the bottom of the viewport, so a footer in the
+# normal page flow ended up stranded directly under the example buttons with
+# a large empty gap between it and the input box. The sidebar has no such
+# pinned element, so the footer sits at its end instead and stays visible
+# however long the conversation grows.
+with st.sidebar:
+    st.divider()
+    st.markdown(
+        "<div style='color:gray; font-size:0.85rem;'>"
+        "Built by Eugen Goebel &middot; "
+        "<a href='https://github.com/eugen-goebel' target='_blank'>GitHub</a> &middot; "
+        "<a href='https://www.linkedin.com/in/eugen-goebel/' target='_blank'>LinkedIn</a>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
