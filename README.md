@@ -91,7 +91,7 @@ smart-doc-qa/
 │   ├── test_chunker.py             # 15 tests
 │   ├── test_vectorstore.py         # 24 tests
 │   ├── test_qa_agent.py            # 19 tests
-│   └── test_app.py                 # 5 tests
+│   └── test_app.py                 # 7 tests
 ├── requirements.txt
 └── README.md
 ```
