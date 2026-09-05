@@ -4,7 +4,6 @@ An AI-powered Retrieval-Augmented Generation (RAG) system that lets you chat wit
 
 ![CI](https://github.com/eugen-goebel/smart-doc-qa/actions/workflows/tests.yml/badge.svg)
 ![Python](https://img.shields.io/badge/Python-3.11+-blue)
-![Tests](https://img.shields.io/badge/Tests-passed-brightgreen)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.40+-red)
 ![ChromaDB](https://img.shields.io/badge/ChromaDB-0.5+-orange)
 ![License](https://img.shields.io/badge/License-MIT-green)
