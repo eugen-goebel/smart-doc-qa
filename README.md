@@ -7,7 +7,7 @@ An AI-powered Retrieval-Augmented Generation (RAG) system that lets you chat wit
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.40+-red)
 ![ChromaDB](https://img.shields.io/badge/ChromaDB-0.5+-orange)
 ![License](https://img.shields.io/badge/License-MIT-green)
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Streamlit_Cloud-FF4B4B?style=flat)](https://eugen-goebel-smart-doc-qa-app-av3twb.streamlit.app/)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Streamlit_Cloud-FF4B4B?style=flat)](https://eugen-goebel-smart-doc-qa-app-av3twb.streamlit.app/)
 
 > **Try it live:** [eugen-goebel-smart-doc-qa-app-av3twb.streamlit.app](https://eugen-goebel-smart-doc-qa-app-av3twb.streamlit.app/). Runs in Demo Mode (no API key required) so you can test the full RAG retrieval flow. Add your own Anthropic key in the sidebar for AI-generated answers.
 
