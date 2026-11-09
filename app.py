@@ -26,7 +26,7 @@ import streamlit as st
 from dotenv import load_dotenv
 
 from agents.chunker import TextChunker
-from agents.document_loader import DocumentLoader
+from agents.document_loader import MAX_UPLOAD_MB, DocumentLoader
 from agents.qa_agent import QAAgent
 from agents.vectorstore import DEFAULT_PERSIST_DIR, VectorStore
 
@@ -147,7 +147,7 @@ with st.sidebar:
         "Upload documents",
         type=["pdf", "docx", "txt", "md"],
         accept_multiple_files=True,
-        help="Drag & drop PDF, DOCX, TXT, or Markdown files here",
+        help=f"Drag & drop PDF, DOCX, TXT, or Markdown files here (max {MAX_UPLOAD_MB} MB each)",
     )
 
     # "Load sample" button for quick testing
@@ -166,6 +166,14 @@ with st.sidebar:
         for file in uploaded:
             # Skip files we already processed
             if file.name in st.session_state.uploaded_files:
+                continue
+
+            # Streamlit enforces server.maxUploadSize already; this gives a clear message
+            if file.size > MAX_UPLOAD_MB * 1024 * 1024:
+                st.error(
+                    f"{file.name} is too large ({file.size / (1024 * 1024):.1f} MB). "
+                    f"The limit is {MAX_UPLOAD_MB} MB per file."
+                )
                 continue
 
             with st.spinner(f"Processing {file.name}..."):

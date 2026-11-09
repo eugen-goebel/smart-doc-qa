@@ -11,7 +11,10 @@ Supported formats:
   - .md   → reads the file directly (Markdown is already human-readable)
 """
 
+import copy
 import os
+import zipfile
+import zlib
 
 from docx import Document
 from pydantic import BaseModel, Field
@@ -46,6 +49,50 @@ class LoadedDocument(BaseModel):
 # ---------------------------------------------------------------------------
 
 SUPPORTED_FORMATS = {".pdf", ".docx", ".txt", ".md"}
+
+# ---------------------------------------------------------------------------
+# Size limits
+# ---------------------------------------------------------------------------
+
+# Per-file upload limit in MB. Keep in sync with `server.maxUploadSize` in
+# .streamlit/config.toml (a test checks this). The server enforces the config
+# value; app.py uses this constant for its own, friendlier error message.
+MAX_UPLOAD_MB = 10
+
+# A .docx is a ZIP archive and can inflate to gigabytes (zip bomb). Refuse to
+# open it if its real unpacked size exceeds this. Read at call time.
+MAX_DOCX_UNPACKED_BYTES = 50 * 1024 * 1024
+
+_ZIP_READ_CHUNK = 1024 * 1024
+
+
+def _check_docx_archive(filepath: str) -> None:
+    """
+    Raise ValueError if the .docx is not a readable ZIP or unpacks too large.
+
+    The size in the ZIP header is NOT trusted: a forged header makes zipfile
+    cut the result short, but only after the whole stream was inflated into
+    memory (python-docx calls ZipFile.read). So we decompress every member in
+    small chunks ourselves and count the bytes that really come out.
+    """
+    limit = MAX_DOCX_UNPACKED_BYTES
+    total = 0
+    try:
+        with zipfile.ZipFile(filepath) as zf:
+            for info in zf.infolist():
+                # Lift the declared-size cap on a copy so we see the real data
+                probe = copy.copy(info)
+                probe.file_size = limit + 1
+                with zf.open(probe) as member:
+                    while chunk := member.read(_ZIP_READ_CHUNK):
+                        total += len(chunk)
+                        if total > limit:
+                            raise ValueError(
+                                f"DOCX unpacks to more than {limit // (1024 * 1024)} MB "
+                                "and was rejected (possible zip bomb)"
+                            )
+    except (zipfile.BadZipFile, zlib.error, EOFError, NotImplementedError, RuntimeError) as e:
+        raise ValueError(f"Not a valid .docx file (corrupt or not a ZIP archive): {e}") from e
 
 
 # ---------------------------------------------------------------------------
@@ -129,8 +176,9 @@ class DocumentLoader:
         Extract text from a Word (.docx) file.
 
         python-docx reads paragraphs. We join non-empty paragraphs
-        with newlines.
+        with newlines. The archive is size-checked first (zip bomb guard).
         """
+        _check_docx_archive(filepath)
         doc = Document(filepath)
         paragraphs = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
         return "\n\n".join(paragraphs), 1

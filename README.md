@@ -39,7 +39,7 @@ An AI-powered Retrieval-Augmented Generation (RAG) system that lets you chat wit
 
 ### RAG Pipeline
 
-1. **Document Loading**: Reads PDF, DOCX, or TXT files and extracts plain text
+1. **Document Loading**: Reads PDF, DOCX, or TXT files and extracts plain text (max 10 MB per file; a DOCX that unpacks to more than 50 MB is rejected as a possible zip bomb)
 2. **Chunking**: Splits text into overlapping ~500-character pieces
 3. **Embedding & Storage**: Each chunk is converted to a vector and stored in ChromaDB
 4. **Retrieval**: When you ask a question, the most relevant chunks are found via similarity search

@@ -1,0 +1,4 @@
+[server]
+# Max size per uploaded file in MB (Streamlit default: 200). Keep in sync with
+# MAX_UPLOAD_MB in agents/document_loader.py.
+maxUploadSize = 10
