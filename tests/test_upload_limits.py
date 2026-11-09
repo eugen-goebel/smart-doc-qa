@@ -1,0 +1,157 @@
+"""Tests for the upload size limits and the .docx zip bomb guard.
+
+Real zip bombs are never written: the unpacked-size limit is lowered with
+monkeypatch so a few MB of padding stand in for gigabytes.
+"""
+
+import io
+import os
+import struct
+import zipfile
+import zlib
+
+import pytest
+import tomllib
+from docx import Document
+from streamlit.testing.v1 import AppTest
+
+import agents.document_loader as loader_module
+from agents.document_loader import DocumentLoader
+
+REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+APP_PATH = os.path.join(REPO_DIR, "app.py")
+
+MB = 1024 * 1024
+
+
+def make_docx(path, padding=0, forge_header=False):
+    """Write a valid .docx; `padding` extra bytes of whitespace go into document.xml.
+
+    With forge_header=True the ZIP headers claim the original small size (and a
+    matching CRC) while the compressed stream still holds all the padding bytes.
+    """
+    buf = io.BytesIO()
+    doc = Document()
+    doc.add_paragraph("Hello from the test document.")
+    doc.save(buf)
+    src = zipfile.ZipFile(io.BytesIO(buf.getvalue()))
+    original = src.read("word/document.xml")
+    padded = original + b" " * padding  # trailing whitespace is valid XML
+
+    out = io.BytesIO()
+    with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
+        for info in src.infolist():
+            z.writestr(
+                info.filename,
+                padded if info.filename == "word/document.xml" else src.read(info.filename),
+            )
+    raw = bytearray(out.getvalue())
+
+    if forge_header:
+        crc = zlib.crc32(padded[: len(original)])
+        pos = 0
+        while (ci := raw.find(b"PK\x01\x02", pos)) >= 0:
+            pos = ci + 4
+            name_len = struct.unpack_from("<H", raw, ci + 28)[0]
+            if raw[ci + 46 : ci + 46 + name_len] != b"word/document.xml":
+                continue
+            local = struct.unpack_from("<I", raw, ci + 42)[0]
+            for base, crc_off, size_off in ((ci, 16, 24), (local, 14, 22)):
+                struct.pack_into("<I", raw, base + crc_off, crc)
+                struct.pack_into("<I", raw, base + size_off, len(original))
+
+    with open(path, "wb") as f:
+        f.write(raw)
+    return str(path)
+
+
+@pytest.fixture
+def loader():
+    return DocumentLoader()
+
+
+# --- Zip bomb guard ---
+
+
+class TestDocxZipBomb:
+    def test_normal_docx_still_loads(self, loader, tmp_path):
+        path = make_docx(tmp_path / "ok.docx")
+        doc = loader.load(path)
+        assert "Hello from the test document." in doc.text
+
+    def test_oversized_docx_is_rejected(self, loader, tmp_path, monkeypatch):
+        monkeypatch.setattr(loader_module, "MAX_DOCX_UNPACKED_BYTES", 1 * MB, raising=False)
+        path = make_docx(tmp_path / "big.docx", padding=3 * MB)
+
+        with pytest.raises(ValueError, match="zip bomb"):
+            loader.load(path)
+
+    def test_forged_header_does_not_bypass_the_limit(self, loader, tmp_path, monkeypatch):
+        monkeypatch.setattr(loader_module, "MAX_DOCX_UNPACKED_BYTES", 1 * MB, raising=False)
+        path = make_docx(tmp_path / "forged.docx", padding=3 * MB, forge_header=True)
+
+        # The declared sizes look harmless, so a header-only check would pass this file
+        with zipfile.ZipFile(path) as zf:
+            assert sum(i.file_size for i in zf.infolist()) < 1 * MB
+
+        with pytest.raises(ValueError, match="zip bomb"):
+            loader.load(path)
+
+
+class TestBrokenDocx:
+    def test_non_zip_content_gives_clear_error(self, loader, tmp_path):
+        path = tmp_path / "fake.docx"
+        path.write_bytes(b"this is plain text, not a zip archive")
+
+        with pytest.raises(ValueError, match="Not a valid .docx"):
+            loader.load(str(path))
+
+    def test_truncated_docx_gives_clear_error(self, loader, tmp_path):
+        good = make_docx(tmp_path / "good.docx")
+        with open(good, "rb") as f:
+            data = f.read()
+        cut = tmp_path / "cut.docx"
+        cut.write_bytes(data[: len(data) // 2])
+
+        with pytest.raises(ValueError, match="Not a valid .docx"):
+            loader.load(str(cut))
+
+
+# --- Upload size limit ---
+
+
+class TestUploadLimit:
+    def test_config_and_constant_agree(self):
+        with open(os.path.join(REPO_DIR, ".streamlit", "config.toml"), "rb") as f:
+            config = tomllib.load(f)
+        assert config["server"]["maxUploadSize"] == loader_module.MAX_UPLOAD_MB == 10
+
+    @pytest.fixture()
+    def app(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("CHROMA_PERSIST_DIR", str(tmp_path / "chroma"))
+        at = AppTest.from_file(APP_PATH, default_timeout=180)
+        at.run()
+        return at
+
+    def test_oversized_file_gets_a_clear_error(self, tmp_path, monkeypatch):
+        # Lower limit keeps the run fast even if the guard were missing
+        monkeypatch.setattr(loader_module, "MAX_UPLOAD_MB", 1, raising=False)
+        monkeypatch.setenv("CHROMA_PERSIST_DIR", str(tmp_path / "chroma"))
+        at = AppTest.from_file(APP_PATH, default_timeout=180)
+        at.run()
+
+        big = b"a" * (1 * MB + 1)
+        at.sidebar.file_uploader[0].upload("huge.txt", big, "text/plain").run()
+
+        assert not at.exception
+        messages = [e.value for e in at.error]
+        assert any("huge.txt" in m and "too large" in m for m in messages), messages
+        assert "huge.txt" not in at.session_state["uploaded_files"]
+
+    def test_file_within_limit_is_indexed(self, app):
+        app.sidebar.file_uploader[0].upload(
+            "small.txt", b"Revenue grew in 2025.", "text/plain"
+        ).run()
+
+        assert not app.exception
+        assert "small.txt" in app.session_state["uploaded_files"]
