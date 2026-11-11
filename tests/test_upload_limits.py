@@ -10,6 +10,8 @@ import struct
 import zipfile
 import zlib
 
+import pypdf
+import pypdf.errors
 import pytest
 import tomllib
 from docx import Document
@@ -65,6 +67,41 @@ def make_docx(path, padding=0, forge_header=False):
     return str(path)
 
 
+def make_pdf_bomb(path, raw_size):
+    """Write a valid one-page PDF whose Flate content stream unpacks to `raw_size` bytes.
+
+    The stream is compressed in chunks, so the raw data is never held in memory at once.
+    """
+    comp = zlib.compressobj(9)
+    body = comp.compress(b"BT /F1 12 Tf 50 700 Td (Hello) Tj ET\n")
+    chunk = b" " * MB
+    for _ in range(raw_size // MB):
+        body += comp.compress(chunk)
+    body += comp.flush()
+
+    objs = [
+        b"<< /Type /Catalog /Pages 2 0 R >>",
+        b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R "
+        b"/Resources << /Font << /F1 5 0 R >> >> >>",
+        b"<< /Length %d /Filter /FlateDecode >>\nstream\n" % len(body) + body + b"\nendstream",
+        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+    ]
+    out = bytearray(b"%PDF-1.4\n")
+    offsets = []
+    for i, obj in enumerate(objs, start=1):
+        offsets.append(len(out))
+        out += b"%d 0 obj\n" % i + obj + b"\nendobj\n"
+    xref = len(out)
+    out += b"xref\n0 %d\n0000000000 65535 f \n" % (len(objs) + 1)
+    out += b"".join(b"%010d 00000 n \n" % off for off in offsets)
+    out += b"trailer\n<< /Size %d /Root 1 0 R >>\nstartxref\n%d\n%%%%EOF\n" % (len(objs) + 1, xref)
+
+    with open(path, "wb") as f:
+        f.write(out)
+    return str(path)
+
+
 @pytest.fixture
 def loader():
     return DocumentLoader()
@@ -115,6 +152,25 @@ class TestBrokenDocx:
 
         with pytest.raises(ValueError, match="Not a valid .docx"):
             loader.load(str(cut))
+
+
+# --- PDF decompression bomb ---
+
+
+class TestPdfDecompressionLimit:
+    def test_normal_generated_pdf_still_loads(self, loader, tmp_path):
+        # Guards the helper: the bomb below must fail because of its size, not a broken PDF
+        path = make_pdf_bomb(tmp_path / "ok.pdf", raw_size=MB)
+        assert "Hello" in loader.load(path).text
+
+    def test_loader_relies_on_pypdf_limit_for_oversized_stream(self, loader, tmp_path):
+        # The loader has no PDF size check of its own: pypdf's zlib limit is the only guard
+        limit = pypdf.Configuration().zlib_maximum_output_length
+        path = make_pdf_bomb(tmp_path / "bomb.pdf", raw_size=limit + 5 * MB)
+        assert os.path.getsize(path) < 1 * MB  # ~80 MB of whitespace deflates to ~80 KB
+
+        with pytest.raises(pypdf.errors.LimitReachedError):
+            loader.load(path)
 
 
 # --- Upload size limit ---

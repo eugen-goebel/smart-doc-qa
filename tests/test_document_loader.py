@@ -6,6 +6,8 @@ import pytest
 
 from agents.document_loader import SUPPORTED_FORMATS, DocumentLoader, LoadedDocument
 
+FIXTURES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures")
+
 
 @pytest.fixture
 def loader():
@@ -84,6 +86,17 @@ class TestDocumentLoader:
         doc = loader.load(sample_md)
         assert doc.filename == "readme.md"
         assert doc.format == "md"
+
+    def test_load_real_multipage_pdf(self, loader):
+        # Fixture was written by fpdf2, not pypdf, so this reads a foreign PDF
+        doc = loader.load(os.path.join(FIXTURES_DIR, "sample_report.pdf"))
+        assert doc.filename == "sample_report.pdf"
+        assert doc.format == "pdf"
+        assert doc.page_count == 3
+        assert "Revenue grew by 12 percent in the first quarter." in doc.text
+        assert "The Hamburg warehouse opened in March." in doc.text
+        assert "stable margins through the end of 2026." in doc.text
+        assert doc.char_count == len(doc.text)
 
     def test_supported_formats_constant(self):
         assert ".pdf" in SUPPORTED_FORMATS
